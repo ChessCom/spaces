@@ -1,4 +1,4 @@
-import { Types } from 'ably';
+import type { PaginatedResult, Message, RealtimeChannel } from 'ably';
 
 import type { CursorUpdate } from './types.js';
 import type { CursorsOptions } from './types.js';
@@ -8,7 +8,7 @@ type ConnectionId = string;
 type ConnectionsLastPosition = Record<ConnectionId, null | CursorUpdate>;
 
 export default class CursorHistory {
-  constructor() {}
+  constructor() { }
 
   private positionsMissing(connections: ConnectionsLastPosition) {
     return Object.keys(connections).some((connectionId) => connections[connectionId] === null);
@@ -29,23 +29,23 @@ export default class CursorHistory {
 
   private allCursorUpdates(
     connections: ConnectionsLastPosition,
-    page: Types.PaginatedResult<Types.Message>,
+    page: PaginatedResult<Message>,
   ): ConnectionsLastPosition {
     return Object.fromEntries(
       Object.entries(connections).map(([connectionId, cursors]) => {
         const lastMessage = page.items.find((item) => item.connectionId === connectionId);
         if (!lastMessage) return [connectionId, cursors];
 
-        const { data = [], clientId }: { data: OutgoingBuffer[] } & Pick<Types.Message, 'clientId'> = lastMessage;
+        const { data = [], clientId }: { data?: OutgoingBuffer[] } & Pick<Message, 'clientId'> = lastMessage;
 
         const lastPositionSet = data[data.length - 1]?.cursor;
         const lastUpdate = lastPositionSet
           ? {
-              clientId,
-              connectionId,
-              position: lastPositionSet.position,
-              data: lastPositionSet.data,
-            }
+            clientId,
+            connectionId,
+            position: lastPositionSet.position,
+            data: lastPositionSet.data,
+          }
           : null;
 
         return [connectionId, lastUpdate];
@@ -54,7 +54,7 @@ export default class CursorHistory {
   }
 
   async getLastCursorUpdate(
-    channel: Types.RealtimeChannelPromise,
+    channel: RealtimeChannel,
     paginationLimit: CursorsOptions['paginationLimit'],
   ): Promise<ConnectionsLastPosition> {
     const members = await channel.presence.get();
@@ -71,7 +71,7 @@ export default class CursorHistory {
     const history = await channel.history();
 
     let pageNo = 1;
-    let page = await history.current();
+    let page: any = await history.current();
     connections = this.allCursorUpdates(connections, page);
     pageNo++;
 

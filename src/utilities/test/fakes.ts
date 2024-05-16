@@ -1,6 +1,6 @@
-import { Types } from 'ably';
+import type { PresenceMessage } from 'ably';
 
-import Space from '../../Space.js';
+import type Space from '../../Space.js';
 
 import type { SpaceMember } from '../../types.js';
 import type { PresenceMember } from '../types.js';
@@ -8,7 +8,7 @@ import type { PresenceMember } from '../types.js';
 // import { nanoidId } from '../../../__mocks__/nanoid/index.js';
 const nanoidId = 'NanoidID';
 
-const enterPresenceMessage: Types.PresenceMessage = {
+const enterPresenceMessage: PresenceMessage = {
   clientId: '1',
   data: {
     profileUpdate: {
@@ -29,12 +29,12 @@ const enterPresenceMessage: Types.PresenceMessage = {
   timestamp: 1,
 };
 
-const updatePresenceMessage: Types.PresenceMessage = {
+const updatePresenceMessage: PresenceMessage = {
   ...enterPresenceMessage,
   action: 'update',
 };
 
-const leavePresenceMessage: Types.PresenceMessage = {
+const leavePresenceMessage: PresenceMessage = {
   ...enterPresenceMessage,
   action: 'leave',
 };
@@ -60,7 +60,7 @@ const createPresenceMessage = <T extends keyof MessageMap>(type: T, override?: P
 
 const createPresenceEvent = async <T extends keyof MessageMap>(
   space: Space,
-  presenceMap: Map<string, Types.PresenceMessage>,
+  presenceMap: Map<string, PresenceMessage>,
   type: T,
   override?: Partial<MessageMap[T]>,
 ) => {

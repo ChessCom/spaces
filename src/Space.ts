@@ -1,4 +1,5 @@
-import Ably, { Types } from 'ably';
+import Ably from 'ably';
+import type { PresenceMessage, Realtime, RealtimeChannel } from 'ably'
 
 import EventEmitter, { InvalidArgumentError, inspect, type EventListener } from './utilities/EventEmitter.js';
 import Locations from './Locations.js';
@@ -85,7 +86,7 @@ class Space extends EventEmitter<SpaceEventMap> {
   /**
    * @internal
    */
-  readonly client: Types.RealtimePromise;
+  readonly client: Realtime;
   private readonly channelName: string;
   /**
    * @internal
@@ -110,7 +111,7 @@ class Space extends EventEmitter<SpaceEventMap> {
   /**
    * The [realtime channel instance](https://ably.com/docs/channels) that this `Space` instance uses for transmitting and receiving data.
    */
-  readonly channel: Types.RealtimeChannelPromise;
+  readonly channel: RealtimeChannel;
   /**
    * An instance of {@link Locks}.
    */
@@ -121,7 +122,7 @@ class Space extends EventEmitter<SpaceEventMap> {
   readonly name: string;
 
   /** @internal */
-  constructor(name: string, client: Types.RealtimePromise, options?: Subset<SpaceOptions>) {
+  constructor(name: string, client: Realtime, options?: Subset<SpaceOptions>) {
     super();
 
     this.client = client;
@@ -209,7 +210,7 @@ class Space extends EventEmitter<SpaceEventMap> {
     return new Promise((resolve) => {
       const presence = this.channel.presence;
 
-      const presenceListener = async (presenceMessage: Types.PresenceMessage) => {
+      const presenceListener = async (presenceMessage: PresenceMessage) => {
         if (
           !(
             presenceMessage.clientId == this.client.auth.clientId &&

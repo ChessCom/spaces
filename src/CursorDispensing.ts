@@ -1,17 +1,17 @@
-import { type CursorUpdate } from './types.js';
-import { type RealtimeMessage } from './utilities/types.js';
+import type { CursorUpdate } from './types.js';
+import type { RealtimeMessage } from './utilities/types.js';
 
 export default class CursorDispensing {
   private buffer: Record<string, { cursor: CursorUpdate; offset: number }[]> = {};
 
-  constructor(private emitCursorUpdate: (update: CursorUpdate) => void) {}
+  constructor(private emitCursorUpdate: (update: CursorUpdate) => void) { }
 
   setEmitCursorUpdate(update: CursorUpdate) {
     this.emitCursorUpdate(update);
   }
 
   emitFromBatch() {
-    for (let connectionId in this.buffer) {
+    for (const connectionId in this.buffer) {
       const buffer = this.buffer[connectionId];
       const update = buffer.shift();
 
@@ -38,7 +38,7 @@ export default class CursorDispensing {
     updates.forEach((update: { cursor: CursorUpdate; offset: number }) => {
       const enhancedMsg = {
         cursor: {
-          clientId: message.clientId,
+          clientId: message.clientId || '',
           connectionId: message.connectionId,
           position: update.cursor.position,
           data: update.cursor.data,
